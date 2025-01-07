@@ -4,13 +4,13 @@ FROM node:18-alpine AS builder
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Copia os arquivos necessários
-COPY package.json package-lock.json ./
+# Copia apenas os arquivos essenciais para instalar as dependências
+COPY package*.json ./
 
 # Instala as dependências
-RUN npm install
+RUN npm ci
 
-# Copia o restante dos arquivos do projeto
+# Copia o restante dos arquivos do projeto para o build
 COPY . .
 
 # Gera o build da aplicação
@@ -22,11 +22,11 @@ FROM node:18-alpine AS runner
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Instala apenas dependências de produção
-COPY package.json package-lock.json ./
-RUN npm install --omit=dev
+# Copia apenas os arquivos necessários para a produção
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-# Copia o build da etapa anterior
+# Copia os artefatos de build gerados na etapa anterior
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./next.config.js
