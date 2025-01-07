@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export default function Menu() {
   return (
     <header className="container flex items-center justify-between gap-8 py-4">
