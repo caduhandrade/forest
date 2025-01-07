@@ -33,7 +33,7 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 
 # Define a porta de execução
-EXPOSE 3000
+EXPOSE 5000
 
 # Comando para iniciar o servidor Next.js
 CMD ["npm", "start"]
