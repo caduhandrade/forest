@@ -1,24 +1,39 @@
-# Dockerfile
-# Use the official Node.js 18 image as the base image
-FROM node:18-alpine
+# Etapa 1: Construção
+FROM node:18-alpine AS builder
 
-# Set the working directory
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copia os arquivos necessários
+COPY package.json package-lock.json ./
 
-# Install dependencies
+# Instala as dependências
 RUN npm install
 
-# Copy the rest of the application code
+# Copia o restante dos arquivos do projeto
 COPY . .
 
-# Build the Next.js application
+# Gera o build da aplicação
 RUN npm run build
 
-# Expose the port the app runs on
+# Etapa 2: Produção
+FROM node:18-alpine AS runner
+
+# Define o diretório de trabalho
+WORKDIR /app
+
+# Instala apenas dependências de produção
+COPY package.json package-lock.json ./
+RUN npm install --omit=dev
+
+# Copia o build da etapa anterior
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/node_modules ./node_modules
+
+# Define a porta de execução
 EXPOSE 3000
 
-# Start the Next.js application
+# Comando para iniciar o servidor Next.js
 CMD ["npm", "start"]
