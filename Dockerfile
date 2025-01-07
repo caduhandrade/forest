@@ -5,7 +5,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copia apenas os arquivos essenciais para instalar as dependências
-COPY package*.json ./
+COPY package*.json tsconfig.json ./
 
 # Instala as dependências
 RUN npm ci
@@ -29,7 +29,7 @@ RUN npm ci --omit=dev
 # Copia os artefatos de build gerados na etapa anterior
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 
 # Define a porta de execução
